@@ -4,7 +4,8 @@ import (
 	_ "shorturl/routers"
 
 	"github.com/astaxie/beego"
-	"shorturl/redisDB"
+	redisDB "shorturl/db/redis"
+	mysqlDB "shorturl/db/mysql"
 )
 
 func main() {
@@ -20,6 +21,13 @@ func main() {
 		panic(err.Error())
 	}
 	defer redisConnect.Close()
+
+	// 连接MySQL数据库
+	mysqlConnect, err := mysqlDB.Connect()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer mysqlConnect.Close()
 
 	beego.Run()
 }

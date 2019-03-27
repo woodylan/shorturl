@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/astaxie/beego/context"
-	"shorturl/redisDB"
+	redisDB "shorturl/db/redis"
 )
 
 type RetData struct {
