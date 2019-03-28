@@ -14,12 +14,14 @@ type ShortUrlLogic struct {
 }
 
 type RetData struct {
-	ShortUrl string `json:"url"`
-	Host     string `json:"host"`
+	Url      string `json:"url"`
+	ShortUrl string `json:"shortUrl"`
 }
 
 func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData RetData) {
 	localhost := beego.AppConfig.String("host")
+	retData.Url = urlString
+
 	// 正则验证URL
 	regex := `(http[s]?|ftp):\/\/([^\/\.]+?)\..+\w$`
 	if m, _ := regexp.MatchString(regex, urlString); !m {
@@ -30,7 +32,6 @@ func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData 
 	model, err := shorturlModel.GetByUrl(urlString)
 	if err == nil {
 		retData.ShortUrl = localhost + model.HashId
-		retData.Host = model.Host
 		return
 	}
 
@@ -49,19 +50,25 @@ func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData 
 	shorturlModel.AddNew(shortUrlId, hashId, urlString, host)
 
 	retData.ShortUrl = localhost + hashId
-	retData.Host = host
 	return
 }
 
-func getHashId(id int64) string {
+func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
+	// 查询是否存在
+	model, err := shorturlModel.GetByHashId(hashId)
+	if err != nil {
+		util.ThrowApi(c, -1, "不存在该HashId")
+	}
 
+	// 如果用了301，搜索时会直接展示真实地址，无法统计到短地址被点击的次数了，也无法收集用户的Cookie, User Agent等信息
+	c.Redirect(302, model.Url)
+}
+
+func getHashId(id int64) string {
 	minLength, err := beego.AppConfig.Int("hash_minLength")
 	if err != nil {
 		panic("配置错误:" + err.Error())
 	}
-
-	println(beego.AppConfig.String("hash_salt"))
-	println(minLength)
 
 	hashIdClass := hashids.NewData()
 	hashIdClass.Salt = beego.AppConfig.String("hash_salt")

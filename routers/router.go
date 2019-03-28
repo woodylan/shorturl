@@ -15,4 +15,6 @@ import (
 
 func init() {
 	beego.Router("/api/short", &controllers.ShortUrlController{}, "*:Create")
+
+	beego.Router("/?:url", &controllers.ShortUrlController{}, "*:Jump")
 }
