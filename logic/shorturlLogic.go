@@ -19,10 +19,19 @@ type RetData struct {
 }
 
 func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData RetData) {
+	localhost := beego.AppConfig.String("host")
 	// 正则验证URL
 	regex := `(http[s]?|ftp):\/\/([^\/\.]+?)\..+\w$`
 	if m, _ := regexp.MatchString(regex, urlString); !m {
 		util.ThrowApi(c, -1, "不是合法的URL：")
+	}
+
+	// 查询是否存在
+	model, err := shorturlModel.GetByUrl(urlString)
+	if err == nil {
+		retData.ShortUrl = localhost + model.HashId
+		retData.Host = model.Host
+		return
 	}
 
 	// 解析URL
@@ -39,15 +48,24 @@ func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData 
 	// 存入数据库
 	shorturlModel.AddNew(shortUrlId, hashId, urlString, host)
 
-	retData.ShortUrl = hashId
+	retData.ShortUrl = localhost + hashId
+	retData.Host = host
 	return
 }
 
 func getHashId(id int64) string {
 
+	minLength, err := beego.AppConfig.Int("hash_minLength")
+	if err != nil {
+		panic("配置错误:" + err.Error())
+	}
+
+	println(beego.AppConfig.String("hash_salt"))
+	println(minLength)
+
 	hashIdClass := hashids.NewData()
-	hashIdClass.Salt = "Salt"
-	hashIdClass.MinLength = 8
+	hashIdClass.Salt = beego.AppConfig.String("hash_salt")
+	hashIdClass.MinLength = minLength
 
 	hashNew, _ := hashids.NewWithData(hashIdClass)
 	// 转码

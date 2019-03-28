@@ -1,0 +1,26 @@
+appname = shorturl
+httpport = 8080
+runmode = dev
+autorender = false
+copyrequestbody = true
+EnableDocs = true
+host = http://127.0.0.1:8080/
+
+# 数据库配置
+db.host = 127.0.0.1
+db.user = root
+db.password = password
+db.port = 3306
+db.name = shorturl
+db.prefix = tb_
+db.timezone = Asia/Shanghai
+
+# Redis配置
+redis_key = shorturl
+redis_host = 127.0.0.1
+redis_port = 6379
+redis_password =
+
+# HASH 配置
+hash_salt = Salt
+hash_minLength = 8
