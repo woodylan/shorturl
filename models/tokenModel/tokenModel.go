@@ -1,4 +1,4 @@
-package shorturlModel
+package tokenModel
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 
 // Model Struct
 type TokenModel struct {
-	Id        int64     `gorm:"column(id);pk" json:"id"`
+	Id        string    `gorm:"column(id);pk" json:"id"`
 	Name      string    `json:"name"`
 	Token     string    `json:"token"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"-"`

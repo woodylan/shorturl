@@ -4,4 +4,4 @@ import (
 	"shorturl/models/tokenModel"
 )
 
-var TokenInfo *shorturlModel.TokenModel
+var TokenInfo *tokenModel.TokenModel

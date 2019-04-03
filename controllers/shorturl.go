@@ -21,7 +21,7 @@ func (c *ShortUrlController) Create() {
 	valid.Valid(&inputData)
 
 	logic := logic.ShortUrlLogic{}
-	ret := logic.Short(c.Ctx, inputData.Url)
+	ret := logic.Create(c.Ctx, inputData.Url)
 
 	c.Data["json"] = RetData{0, "success", ret}
 	c.ServeJSON()

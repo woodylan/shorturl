@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"regexp"
 	"shorturl/models/shorturl"
+	"shorturl/models/jumpLogModel"
+	"strings"
 )
 
 type ShortUrlLogic struct {
@@ -18,7 +20,8 @@ type RetData struct {
 	ShortUrl string `json:"shortUrl"`
 }
 
-func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData RetData) {
+// 创建短链接
+func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData RetData) {
 	localhost := beego.AppConfig.String("host")
 	retData.LongUrl = urlString
 
@@ -58,7 +61,18 @@ func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	model, err := shorturlModel.GetByHashId(hashId)
 	if err != nil {
 		util.ThrowApi(c, -1, "不存在该HashId")
+		return
 	}
+
+	userAgent := c.Request.Header.Get("User-Agent")
+	remoteAddr := c.Request.RemoteAddr
+	referer := c.Request.Referer()
+
+	pos := strings.Index(remoteAddr, ":")
+	ip := string([]rune(remoteAddr)[:pos])
+
+	// 添加访问日志
+	jumpLogModel.AddNew(model.Id, userAgent, ip, referer)
 
 	// 如果用了301，搜索时会直接展示真实地址，无法统计到短地址被点击的次数了，也无法收集用户的Cookie, User Agent等信息
 	c.Redirect(302, model.Url)

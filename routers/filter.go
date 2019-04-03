@@ -11,9 +11,9 @@ import (
 var filterLoggedInUser = func(ctx *context.Context) {
 	token := ctx.Input.Header("Token")
 	if token != "" {
-		tokenInfo := shorturlModel.TokenModel{}
+		tokenInfo := tokenModel.TokenModel{}
 
-		model, err := shorturlModel.GetByToken(token)
+		model, err := tokenModel.GetByToken(token)
 		if err != nil {
 			util.ThrowApi(ctx, -1, "Token不存在")
 			return
