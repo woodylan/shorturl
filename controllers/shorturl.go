@@ -2,17 +2,26 @@ package controllers
 
 import (
 	"shorturl/logic"
-)
+	"github.com/astaxie/beego/validation"
+	)
 
 type ShortUrlController struct {
 	Controller
 }
 
 func (c *ShortUrlController) Create() {
-	url := c.GetString("url")
+	inputData := struct {
+		Url string `data:"url" valid:"Required"`
+	}{}
+
+	c.GetData(&inputData)
+	c.Valid(&inputData)
+
+	valid := validation.Validation{}
+	valid.Valid(&inputData)
 
 	logic := logic.ShortUrlLogic{}
-	ret := logic.Short(c.Ctx, url)
+	ret := logic.Short(c.Ctx, inputData.Url)
 
 	c.Data["json"] = RetData{0, "success", ret}
 	c.ServeJSON()

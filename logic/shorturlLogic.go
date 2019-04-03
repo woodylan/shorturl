@@ -14,18 +14,18 @@ type ShortUrlLogic struct {
 }
 
 type RetData struct {
-	Url      string `json:"url"`
+	LongUrl  string `json:"longUrl"`
 	ShortUrl string `json:"shortUrl"`
 }
 
 func (this *ShortUrlLogic) Short(c *context.Context, urlString string) (retData RetData) {
 	localhost := beego.AppConfig.String("host")
-	retData.Url = urlString
+	retData.LongUrl = urlString
 
 	// 正则验证URL
 	regex := `(http[s]?|ftp):\/\/([^\/\.]+?)\..+\w$`
 	if m, _ := regexp.MatchString(regex, urlString); !m {
-		util.ThrowApi(c, -1, "不是合法的URL：")
+		util.ThrowApi(c, -1, "不是合法的URL")
 	}
 
 	// 查询是否存在
