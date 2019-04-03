@@ -6,41 +6,22 @@ import (
 )
 
 // Model Struct
-type Token struct {
+type TokenModel struct {
 	Id        int64     `gorm:"column(id);pk" json:"id"`
 	Name      string    `json:"name"`
-	AccessKey string    `json:"accessKey"`
-	SecretKey string    `json:"secretKey"`
+	Token     string    `json:"token"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"-"`
 }
 
-func (a *Token) TableName() string {
-	return "tb_account"
+func (a *TokenModel) TableName() string {
+	return "tb_token"
 }
 
-func AddNew(id int64, HashId string, Url string, Host string) (ShortUrl, bool) {
-	data := ShortUrl{Id: id, HashId: HashId, Url: Url, Host: Host}
+func GetByToken(token string) (TokenModel, error) {
+	tokenInfo := TokenModel{}
 
-	db.Conn.Create(&data)
-	res := db.Conn.NewRecord(&data)
-
-	return data, !res
-}
-
-func GetByUrl(url string) (ShortUrl, error) {
-	urlInfo := ShortUrl{}
-
-	res := db.Conn.Where("url = ?", url).First(&urlInfo)
+	res := db.Conn.Where("token = ?", token).First(&tokenInfo)
 	err := res.Error
 
-	return urlInfo, err
-}
-
-func GetByToken(hashId string) (ShortUrl, error) {
-	urlInfo := ShortUrl{}
-
-	res := db.Conn.Where("hash_id = ?", hashId).First(&urlInfo)
-	err := res.Error
-
-	return urlInfo, err
+	return tokenInfo, err
 }

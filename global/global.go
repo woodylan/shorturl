@@ -1,7 +1,7 @@
 package global
 
 import (
-		"shorturl/logic"
+	"shorturl/models/tokenModel"
 )
 
-var TokenInfo *logic.TokenData
+var TokenInfo *shorturlModel.TokenModel

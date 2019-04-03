@@ -3,29 +3,30 @@ package routers
 import (
 	"github.com/astaxie/beego/context"
 	_ "github.com/astaxie/beego/cache/redis"
-	redisDB "shorturl/db/redis"
 	"shorturl/modules/util"
-	"shorturl/logic"
 	"shorturl/global"
+	"shorturl/models/tokenModel"
 )
 
 var filterLoggedInUser = func(ctx *context.Context) {
 	token := ctx.Input.Header("Token")
 	if token != "" {
-		tokenData := logic.TokenData{}
+		tokenInfo := shorturlModel.TokenModel{}
 
-		redis := redisDB.RedisConnect.Get("shorturl:" + token)
-		if redis == nil {
-			util.ThrowApi(ctx, -1, "用户未登录")
+		model, err := shorturlModel.GetByToken(token)
+		if err != nil {
+			util.ThrowApi(ctx, -1, "Token不存在")
 			return
 		}
 
-		util.JsonDecode(string(redis.Val()), &tokenData)
+		tokenInfo.Id = model.Id
+		tokenInfo.Name = model.Name
+		tokenInfo.Token = model.Token
 
 		//存到全局
-		global.TokenInfo = &tokenData
+		global.TokenInfo = &tokenInfo
 	} else {
-		util.ThrowApi(ctx, -1, "缺少token")
+		util.ThrowApi(ctx, -1, "Header缺少Token")
 		return
 	}
 }
