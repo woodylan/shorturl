@@ -15,6 +15,8 @@ import (
 
 func init() {
 	beego.Router("/api/short", &controllers.ShortUrlController{}, "*:Create")
-
 	beego.Router("/?:url", &controllers.ShortUrlController{}, "*:Jump")
+
+	// 中间件过滤
+	beego.InsertFilter("/api/*", beego.BeforeRouter, filterLoggedInUser)
 }

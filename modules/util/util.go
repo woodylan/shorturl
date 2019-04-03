@@ -3,6 +3,8 @@ package util
 import (
 	"github.com/astaxie/beego/context"
 	redisDB "shorturl/db/redis"
+	"encoding/json"
+	"strings"
 )
 
 type RetData struct {
@@ -29,4 +31,15 @@ func GetRedisNum(key string) int64 {
 
 	val, _ := redisDB.RedisConnect.Incr(key).Result()
 	return val
+}
+
+func JsonDecode(jsonStr string, structModel interface{}) error {
+	decode := json.NewDecoder(strings.NewReader(jsonStr))
+	err := decode.Decode(structModel)
+	return err
+}
+
+func JsonEncode(structModel interface{}) (string, error) {
+	jsonStr, err := json.Marshal(structModel)
+	return string(jsonStr), err
 }
