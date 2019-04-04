@@ -20,6 +20,11 @@ type RetData struct {
 	ShortUrl string `json:"shortUrl"`
 }
 
+type QueryRetData struct {
+	LongUrl  string `json:"longUrl"`
+	ShortUrl string `json:"shortUrl"`
+}
+
 // 创建短链接
 func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData RetData) {
 	localhost := beego.AppConfig.String("host")
@@ -78,6 +83,32 @@ func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	c.Redirect(302, model.Url)
 }
 
+// 查询短链接
+func (this *ShortUrlLogic) Query(c *context.Context, urlString string) (retData QueryRetData) {
+	// 解析URL
+	urlParse, _ := url.Parse(urlString)
+	uri := urlParse.Path
+
+	if uri == "" {
+		util.ThrowApi(c, -1, "URI不存在")
+		return
+	}
+
+	hashId := string([]rune(uri)[1:])
+
+	// 查询是否存在
+	model, err := shorturlModel.GetByHashId(hashId)
+	if err != nil {
+		util.ThrowApi(c, -1, "不存在该HashId")
+		return
+	}
+
+	retData.ShortUrl = urlString
+	retData.LongUrl = model.Url
+
+	return
+}
+
 func getHashId(id int64) string {
 	minLength, err := beego.AppConfig.Int("hash_minLength")
 	if err != nil {
@@ -91,10 +122,6 @@ func getHashId(id int64) string {
 	hashNew, _ := hashids.NewWithData(hashIdClass)
 	// 转码
 	hashId, _ := hashNew.EncodeInt64([]int64{id})
-
-	////解码
-	//d, _ := hashNew.DecodeWithError(e)
-	//fmt.Println(d[0])
 
 	return hashId
 }

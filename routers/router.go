@@ -15,6 +15,7 @@ import (
 
 func init() {
 	beego.Router("/api/v1/create", &controllers.CreateController{}, "*:Run")
+	beego.Router("/api/v1/query", &controllers.QueryController{}, "*:Run")
 	beego.Router("/?:url", &controllers.JumpController{}, "*:Run")
 
 	// 中间件过滤
