@@ -101,20 +101,14 @@
    }
    ```
 
-
-
-
-## 注意
-MySQL需要开启大小写敏感
-
 ## 接口使用
 ### 短网址生成接口
 
-**请求地址**：/api/v1/create
+**请求地址：** /api/v1/create
 
-**请求方式：**POST
+**请求方式：** POST
 
-**Content-Type：**application/json; charset=UTF-8
+**Content-Type：** application/json; charset=UTF-8
 
 **请求头Headers：**
 
@@ -187,13 +181,13 @@ PHP
 
 ### 短网址还原接口
 
-**请求地址**：/api/v1/query
+**请求地址：** /api/v1/query
 
-**请求方式：**POST
+**请求方式：** POST
 
-**Content-Type：**application/json; charset=UTF-8
+**Content-Type：** application/json; charset=UTF-8
 
-**请求头Headers：**
+**请求头Headers**
 
 | 字段  | 类型   | 是否必须 | 说明                       |
 | ----- | ------ | -------- | -------------------------- |
@@ -262,6 +256,9 @@ PHP
 }
 ```
 
+
+## 注意
+MySQL需要开启大小写敏感
 
 
 ## 未完成功能
