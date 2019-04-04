@@ -2,7 +2,7 @@
 
 ## 简介
 
-本项目基于Golang编写，使用beego框架。使用redis做发号器，将整数转换成62进制的数，实现缩短网址的目的。支持加自定义salt，自定义最短uri长度。目前只完成了一个基础能用的版本，后续加入一些新特性。
+本项目基于Golang编写，使用beego框架。使用redis做发号器，将整数转换成62进制的数，实现缩短网址的目的。支持加自定义salt，自定义最短uri长度。目前除了基础功能，完成了权限和日志，后续继续加入一些新特性。
 
 
 
@@ -101,18 +101,176 @@
    }
    ```
 
-   
-
-## 使用
 
 
+
+## 注意
+MySQL需要开启大小写敏感
+
+## 接口使用
+### 短网址生成接口
+
+**请求地址**：/api/v1/create
+
+**请求方式：**POST
+
+**Content-Type：**application/json; charset=UTF-8
+
+**请求头Headers：**
+
+| 字段  | 类型   | 是否必须 | 说明                       |
+| ----- | ------ | -------- | -------------------------- |
+| Token | string | 是       | 由数字和字母组成的32位字符 |
+
+**请求体Body：**
+
+| 字段 | 类型   | 是否必须 | 说明    | 示例                  |
+| ---- | ------ | -------- | ------- | --------------------- |
+| url  | string | 是       | URL地址 | "https://github.com/" |
+
+**代码示例：**
+
+curl
+
+```shell
+curl -H "Content-Type:application/json; charset=UTF-8" -H "Token: 你的token" -X POST "http://localhost:8080/api/v1/create" -d '{"url":"你的长网址"}'
+```
+
+PHP
+
+```php
+<?php
+    $url = 'http://localhost:8080/api/v1/create';
+    $method = 'POST';
+    
+    // TODO: 设置Token
+    $token = '你的Token';
+    
+    // TODO：设置待注册长网址
+    $bodys = array('url'=>'你的长网址'); 
+    
+    // 配置headers 
+    $headers = array('Content-Type:application/json; charset=UTF-8', 'Token:'.$token);
+    
+    // 创建连接
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_FAILONERROR, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($bodys));
+    
+    // 发送请求
+    $response = curl_exec($curl);
+    curl_close($curl);
+    
+    // 读取响应
+    var_dump($response);
+    ?>
+
+```
+
+**响应结果示例：**
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "longUrl": "https://github.com/",
+        "shortUrl": "http://127.0.0.1:8080/789Yp146"
+    }
+}
+```
+
+### 短网址还原接口
+
+**请求地址**：/api/v1/query
+
+**请求方式：**POST
+
+**Content-Type：**application/json; charset=UTF-8
+
+**请求头Headers：**
+
+| 字段  | 类型   | 是否必须 | 说明                       |
+| ----- | ------ | -------- | -------------------------- |
+| Token | string | 是       | 由数字和字母组成的32位字符 |
+
+**请求体Body：**
+
+| 字段     | 类型   | 是否必须 | 说明   | 示例                             |
+| -------- | ------ | -------- | ------ | -------------------------------- |
+| shortUrl | string | 是       | 短网址 | "http://127.0.0.1:8080/RQ9P3L4y" |
+
+**代码示例：**
+
+curl
+
+```shell
+curl -H "Content-Type:application/json; charset=UTF-8" -H "Token: 你的token" -X POST "http://localhost:8080/api/v1/query" -d '{"shortUrl":"你的短网址"}'
+```
+
+PHP
+
+```php
+<?php
+    $url = 'http://localhost:8080/api/v1/query';
+    $method = 'POST';
+    
+    // TODO: 设置Token
+    $token = '你的Token';
+    
+    // TODO: 设置还原的短网址
+    $bodys = array('shortUrl'=>'你的短网址'); 
+    
+    // 配置headers 
+    $headers = array('Content-Type:application/json; charset=UTF-8', 'Token:'.$token);
+    
+    // 创建连接
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_FAILONERROR, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($bodys));
+    
+    // 发送请求
+    $response = curl_exec($curl);
+    curl_close($curl);
+    
+    // 读取响应
+    var_dump($response);
+    ?>
+
+```
+
+**响应结果示例：**
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "longUrl": "https://github.com/",
+        "shortUrl": "http://127.0.0.1:8080/789Yp146"
+    }
+}
+```
 
 
 
 ## 未完成功能
 
-- [ ] 账户授权模式
+- [x] 账户授权模式
+- [x] 访问日志
 - [ ] 设置短网址有效期
 - [ ] 统计功能
 - [ ] 短网址加密访问
 - [ ] 用户自定义短码
+- [ ] 黑名单
+- [ ] 内容鉴定
