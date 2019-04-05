@@ -6,6 +6,7 @@ import (
 	"shorturl/modules/util"
 	"shorturl/global"
 	"shorturl/models/tokenModel"
+	"shorturl/define/retcode"
 )
 
 var filterLoggedInUser = func(ctx *context.Context) {
@@ -15,7 +16,7 @@ var filterLoggedInUser = func(ctx *context.Context) {
 
 		model, err := tokenModel.GetByToken(token)
 		if err != nil {
-			util.ThrowApi(ctx, -1, "Token不存在")
+			util.ThrowApi(ctx, retcode.TokenNotFound, "Token不存在")
 			return
 		}
 
@@ -26,7 +27,7 @@ var filterLoggedInUser = func(ctx *context.Context) {
 		//存到全局
 		global.TokenInfo = &tokenInfo
 	} else {
-		util.ThrowApi(ctx, -1, "Header缺少Token")
+		util.ThrowApi(ctx, retcode.TokenNotFound, "Header缺少Token")
 		return
 	}
 }

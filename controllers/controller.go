@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"log"
 	"shorturl/modules/util"
+	"shorturl/define/retcode"
 )
 
 type Controller struct {
@@ -40,7 +41,7 @@ func (c *Controller) Valid(inputData interface{}) {
 	if !b {
 		// 处理抛出验证不通过
 		for _, err := range valid.Errors {
-			util.ThrowApi(c.Ctx, -1, err.Key+" "+err.Message)
+			util.ThrowApi(c.Ctx, retcode.ErrParam, err.Key+" "+err.Message)
 			log.Println(err.Key, err.Message)
 		}
 	}

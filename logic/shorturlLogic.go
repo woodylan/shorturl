@@ -6,9 +6,10 @@ import (
 	"shorturl/modules/util"
 	"github.com/astaxie/beego"
 	"net/url"
-		"shorturl/models/shorturl"
+	"shorturl/models/shorturl"
 	"shorturl/models/jumpLogModel"
 	"strings"
+	"shorturl/define/retcode"
 )
 
 type ShortUrlLogic struct {
@@ -34,7 +35,7 @@ func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData
 	host := urlParse.Host
 
 	if host == "" {
-		util.ThrowApi(c, -1, "不是合法的URL")
+		util.ThrowApi(c, retcode.ErrValidateFailUrl, "不是合法的URL")
 		return
 	}
 
@@ -63,7 +64,7 @@ func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	// 查询是否存在
 	model, err := shorturlModel.GetByHashId(hashId)
 	if err != nil {
-		util.ThrowApi(c, -1, "不存在该HashId")
+		util.ThrowApi(c, retcode.ErrHashIdNotFound, "不存在该HashId")
 		return
 	}
 
@@ -88,7 +89,7 @@ func (this *ShortUrlLogic) Query(c *context.Context, urlString string) (retData 
 	uri := urlParse.Path
 
 	if uri == "" {
-		util.ThrowApi(c, -1, "URI不存在")
+		util.ThrowApi(c, retcode.ErrUrlNotFound, "URI不存在")
 		return
 	}
 
@@ -97,7 +98,7 @@ func (this *ShortUrlLogic) Query(c *context.Context, urlString string) (retData 
 	// 查询是否存在
 	model, err := shorturlModel.GetByHashId(hashId)
 	if err != nil {
-		util.ThrowApi(c, -1, "不存在该HashId")
+		util.ThrowApi(c, retcode.ErrHashIdNotFound, "不存在该HashId")
 		return
 	}
 
