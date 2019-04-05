@@ -6,8 +6,7 @@ import (
 	"shorturl/modules/util"
 	"github.com/astaxie/beego"
 	"net/url"
-	"regexp"
-	"shorturl/models/shorturl"
+		"shorturl/models/shorturl"
 	"shorturl/models/jumpLogModel"
 	"strings"
 )
@@ -30,10 +29,13 @@ func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData
 	localhost := beego.AppConfig.String("host")
 	retData.LongUrl = urlString
 
-	// 正则验证URL
-	regex := `(http[s]?|ftp):\/\/([^\/\.]+?)\..+\w$`
-	if m, _ := regexp.MatchString(regex, urlString); !m {
+	// 解析URL
+	urlParse, _ := url.Parse(urlString)
+	host := urlParse.Host
+
+	if host == "" {
 		util.ThrowApi(c, -1, "不是合法的URL")
+		return
 	}
 
 	// 查询是否存在
@@ -42,10 +44,6 @@ func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData
 		retData.ShortUrl = localhost + model.HashId
 		return
 	}
-
-	// 解析URL
-	urlParse, _ := url.Parse(urlString)
-	host := urlParse.Host
 
 	// 通过发号器获取ID
 	redisKey := beego.AppConfig.String("redis_key")
