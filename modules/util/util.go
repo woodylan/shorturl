@@ -24,6 +24,7 @@ func ThrowApi(ctx *context.Context, code int, msg string) (*context.Context) {
 
 // redis发号器key
 func GetRedisNum(key string) int64 {
+	key = key + ":IncKey"
 	existValue, _ := redisDB.RedisConnect.Exists(key).Result()
 	if existValue == 0 {
 		redisDB.RedisConnect.Set(key, 1, 0)

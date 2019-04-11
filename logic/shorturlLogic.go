@@ -7,9 +7,12 @@ import (
 	"github.com/astaxie/beego"
 	"net/url"
 	"shorturl/models/shorturl"
-	"shorturl/models/jumpLogModel"
-	"strings"
 	"shorturl/define/retcode"
+	redisDB "shorturl/db/redis"
+	"fmt"
+	"strings"
+	"shorturl/models/jumpLogModel"
+	"strconv"
 )
 
 type ShortUrlLogic struct {
@@ -56,14 +59,23 @@ func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData
 	// 存入数据库
 	shorturlModel.AddNew(shortUrlId, hashId, urlString, host)
 
+	hashMap := map[string]interface{}{
+		"url": urlString,
+		"id":  shortUrlId,
+	}
+
+	// 写入到Redis
+	redisDB.RedisConnect.HMSet(redisKey+":Code:"+hashId, hashMap)
+
 	retData.ShortUrl = localhost + hashId
 	return
 }
 
 func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
-	// 查询是否存在
-	model, err := shorturlModel.GetByHashId(hashId)
-	if err != nil {
+	redisKey := beego.AppConfig.String("redis_key")
+	hashValue := redisDB.RedisConnect.HGetAll(redisKey + ":Code:" + hashId).Val()
+	fmt.Println(hashValue)
+	if len(hashValue) == 0 {
 		util.ThrowApi(c, retcode.ErrHashIdNotFound, "不存在该HashId")
 		return
 	}
@@ -76,10 +88,11 @@ func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	ip := string([]rune(remoteAddr)[:pos])
 
 	// 添加访问日志
-	jumpLogModel.AddNew(model.Id, userAgent, ip, referer)
+	urlId, _ := strconv.ParseInt(hashValue["id"], 10, 64)
+	jumpLogModel.AddNew(urlId, userAgent, ip, referer)
 
 	// 如果用了301，搜索时会直接展示真实地址，无法统计到短地址被点击的次数了，也无法收集用户的Cookie, User Agent等信息
-	c.Redirect(302, model.Url)
+	c.Redirect(302, hashValue["url"])
 }
 
 // 查询短链接
