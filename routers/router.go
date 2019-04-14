@@ -9,7 +9,6 @@ package routers
 
 import (
 	"shorturl/controllers"
-
 	"github.com/astaxie/beego"
 )
 

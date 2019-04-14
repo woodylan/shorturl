@@ -9,7 +9,6 @@ import (
 	"shorturl/models/shorturl"
 	"shorturl/define/retcode"
 	redisDB "shorturl/db/redis"
-	"fmt"
 	"strings"
 	"shorturl/models/jumpLogModel"
 	"strconv"
@@ -74,7 +73,6 @@ func (this *ShortUrlLogic) Create(c *context.Context, urlString string) (retData
 func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	redisKey := beego.AppConfig.String("redis_key")
 	hashValue := redisDB.RedisConnect.HGetAll(redisKey + ":Code:" + hashId).Val()
-	fmt.Println(hashValue)
 	if len(hashValue) == 0 {
 		util.ThrowApi(c, retcode.ErrHashIdNotFound, "不存在该HashId")
 		return

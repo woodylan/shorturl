@@ -2,7 +2,6 @@ package routers
 
 import (
 	"github.com/astaxie/beego/context"
-	_ "github.com/astaxie/beego/cache/redis"
 	"shorturl/modules/util"
 	"shorturl/global"
 	"shorturl/models/tokenModel"
