@@ -77,11 +77,9 @@
    server {
        listen  80;
        server_name www.example.com;
-       root /wwwroot/publish/shorturl/public;
    
        access_log /wwwroot/publish/shorturl/logs/access.log;
        error_log /wwwroot/publish/shorturl/logs/error.log;
-       index index.php index.html index.htm;
    
        # ssl ------
        listen       443 ssl;
@@ -89,10 +87,6 @@
        ssl_certificate_key  /etc/letsencrypt/live/example.com/privkey.pem;
    
        location / {
-           try_files /_not_exists_ @backend;
-       }
-   
-       location @backend {
            proxy_set_header X-Forwarded-For $remote_addr;
            proxy_set_header Host            $http_host;
    
