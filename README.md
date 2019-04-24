@@ -85,6 +85,11 @@
        listen       443 ssl;
        ssl_certificate      /etc/letsencrypt/live/example.com/fullchain.pem;
        ssl_certificate_key  /etc/letsencrypt/live/example.com/privkey.pem;
+
+       # 关闭 [/favicon.ico] 和 [/robots.txt] 的访问日志。
+       # 并且即使它们不存在，也不写入错误日志。
+       location = /favicon.ico { access_log off; log_not_found off; }
+       location = /robots.txt  { access_log off; log_not_found off; }
    
        location / {
            proxy_set_header X-Forwarded-For $remote_addr;
