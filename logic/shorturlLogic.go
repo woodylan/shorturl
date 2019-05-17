@@ -9,7 +9,6 @@ import (
 	"shorturl/models/shorturl"
 	"shorturl/define/retcode"
 	redisDB "shorturl/db/redis"
-	"strings"
 	"shorturl/models/jumpLogModel"
 	"strconv"
 )
@@ -79,11 +78,8 @@ func (this *ShortUrlLogic) Jump(c *context.Context, hashId string) {
 	}
 
 	userAgent := c.Request.Header.Get("User-Agent")
-	remoteAddr := c.Request.RemoteAddr
+	ip := c.Request.Header.Get("X-Forwarded-For")
 	referer := c.Request.Referer()
-
-	pos := strings.Index(remoteAddr, ":")
-	ip := string([]rune(remoteAddr)[:pos])
 
 	// 添加访问日志
 	urlId, _ := strconv.ParseInt(hashValue["id"], 10, 64)
